@@ -32,3 +32,9 @@ footer {
 .track-bar input[type="range"] {
   width: 100%;
 }
+
+.ubobject {
+  position: absolute;
+  font-family: "Verdana";
+  font-size: 14px;
+}

@@ -1,14 +1,14 @@
 const runners = {
+  "Ambrus": { pace: "5:50" },
+  "FLaci": { pace: "6:00" },
+  "Gabi": { pace: "6:40" },
   "Sasa": { pace: "5:30" },
   "PP": { pace: "5:00" },
-  "Szabi": { pace: "5:00" },
-  "Gabi": { pace: "6:40" },
-  "Ambrus": { pace: "5:50" },
+  "Dávid": { pace: "5:40" },
+  "PLaci": { pace: "5:00" },
   "Máté": { pace: "6:00" },
   "Zsófi": { pace: "5:50" },
-  "FLaci": { pace: "6:00" },
-  "PLaci": { pace: "5:00" },
-  "Dávid": { pace: "5:40" }
+  "Szabi": { pace: "5:00" }
 }
 
 const sections = {
@@ -173,6 +173,69 @@ function sortLegs(legs) {
   }
 }
 
+function positionSectionObjects() {
+  const content = document.querySelector('.content');
+  const sectionKeys = Object.keys(sections);
+  const count = sectionKeys.length;
+  const contentHeight = content.offsetHeight;
+  const topMargin = 40;
+  const bottomMargin = 10;
+  const availableHeight = contentHeight - topMargin - bottomMargin;
+  const divHeight = availableHeight / count;
+
+  for (let i = 0; i < count; i++) {
+    const div = document.getElementById(sectionKeys[i]);
+    div.style.left = '1em';
+    div.style.top = `${topMargin + i * divHeight}px`;
+    // div.style.height = `${divHeight}px`;
+  }
+}
+
+function createSectionObjects() {
+  const content = document.querySelector('.content');
+  const sectionKeys = Object.keys(sections);
+
+  for (let i = 0; i < sectionKeys.length; i++) {
+    const div = document.createElement('div');
+    div.id = sectionKeys[i];
+    div.className = 'ubobject';
+    div.textContent = sectionKeys[i];
+    content.appendChild(div);
+  }
+  positionSectionObjects();
+}
+
+function createRunnerObjects() {
+  const content = document.querySelector('.content');
+  const runnerKeys = Object.keys(runners);
+
+  for (let i = 0; i < runnerKeys.length; i++) {
+    const div = document.createElement('div');
+    div.id = runnerKeys[i];
+    div.className = 'ubobject';
+    div.style.top = '1em';
+    div.textContent = runnerKeys[i];
+    content.appendChild(div);
+  }
+  positionRunnerObjects();
+}
+
+function positionRunnerObjects() {
+  const content = document.querySelector('.content');
+  const runnerKeys = Object.keys(runners);
+  const count = runnerKeys.length;
+  const contentWidth = content.offsetWidth;
+  const leftMargin = 300;
+  const rightMargin = 10;
+  const availableWidth = contentWidth - leftMargin - rightMargin;
+  const divWidth = availableWidth / count;
+
+  for (let i = 0; i < count; i++) {
+    const div = document.getElementById(runnerKeys[i]);
+    div.style.left = `${leftMargin + i * divWidth}px`;
+  }
+}
+
 function initializeLegs() {
   let legs = {};
   for (let r of Object.keys(runners)) {
@@ -193,6 +256,8 @@ function initialize() {
   ubt1 = new Date(sections["Cél"].timeEnd);
   setupTrackSlider();
   updateTimeDisplay();
+  createSectionObjects();
+  createRunnerObjects();
 }
 
 function setupTrackSlider() {
@@ -202,7 +267,7 @@ function setupTrackSlider() {
   slider.max = totalMinutes;
   slider.step = 1;
   slider.value = 0;
-  slider.addEventListener('input', function() {
+  slider.addEventListener('input', function () {
     t = new Date(ubt0.getTime() + this.value * 60 * 1000);
     updateTimeDisplay();
   });
@@ -222,3 +287,7 @@ function updateTimeDisplay() {
 // console.log(legs);
 
 window.addEventListener('DOMContentLoaded', initialize);
+window.addEventListener('resize', () => {
+  positionSectionObjects();
+  positionRunnerObjects();
+});
