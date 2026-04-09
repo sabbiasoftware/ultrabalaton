@@ -10,7 +10,7 @@ body {
 }
 
 footer {
-  height: 4em;
+  height: 8em;
   display: flex;
   align-items: center;
   padding: 0 1em;
@@ -22,6 +22,11 @@ footer {
   margin-left: auto;
 }
 
+.text-box input {
+  font-size: 2em;
+  padding: 0.25em 0.5em;
+}
+
 .track-bar {
   margin-right: auto;
   display: flex;
@@ -31,13 +36,21 @@ footer {
 
 .track-bar input[type="range"] {
   width: 100%;
+  height: 1.5em;
+  cursor: pointer;
+}
+
+.track-bar input[type="range"]::-webkit-slider-thumb {
+  width: 2em;
+  height: 2em;
+  -webkit-appearance: none;
 }
 
 #play-pause-btn {
-  width: 2.5em;
-  height: 2.5em;
+  width: 3em;
+  height: 3em;
   margin-right: 0.5em;
-  font-size: 1em;
+  font-size: 2em;
   background: #555;
   color: white;
   border: none;
