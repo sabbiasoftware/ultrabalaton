@@ -12,6 +12,7 @@ const runners = {
 }
 
 const sections = {
+  "HQ1": { distance: 2, runner: "" },
   "Rajt": { distance: 7, runner: "Ambrus" },
   "Aszófő": { distance: 4.6, runner: "Ambrus" },
   "Fövenyes": { distance: 4.5, runner: "FLaci" },
@@ -21,7 +22,7 @@ const sections = {
   "Balatonszepezd": { distance: 3.2, runner: "Sasa" },
   "Révfülöp kelet": { distance: 1.9, runner: "Sasa" },
   "Révfülöp nyugat": { distance: 5.2, runner: "Sasa" },
-  "Ábrahámhegy ": { distance: 3.2, runner: "PP" },
+  "Ábrahámhegy": { distance: 3.2, runner: "PP" },
   "Badacsonyörs Varga pincészet": { distance: 5.1, runner: "PP" },
   "Badacsony": { distance: 4.3, runner: "PP" },
   "Badacsonytördemic": { distance: 2.9, runner: "Dávid" },
@@ -70,7 +71,8 @@ const sections = {
   "Alsóörs": { distance: 4.8, runner: "PP" },
   "Csopak": { distance: 4.2, runner: "PP" },
   "Balatonfüred kelet": { distance: 3.5, runner: "PP" },
-  "Cél": { distance: 0, runner: "" }
+  "Cél": { distance: 2, runner: "" },
+  "HQ2": { distance: 0, runner: "" }
 }
 
 
@@ -80,29 +82,39 @@ function paceToSec(pace) {
 }
 
 // Calculate sum of distance between section s1 and s2 by adding distances from s1 (inclusive) till s2 (exclusive).
+// Return negative value if s1 is a later section than s2.
 function getDistance(s1, s2) {
   const sectionKeys = Object.keys(sections);
-  const idx1 = sectionKeys.indexOf(s1);
-  const idx2 = sectionKeys.indexOf(s2);
+  let i1 = sectionKeys.indexOf(s1);
+  let i2 = sectionKeys.indexOf(s2);
+  let d = 1;
+  if (i2 < i1) {
+    d = -1;
+    let t = i1;
+    i1 = i2;
+    i2 = t;
+  }
 
   let sum = 0;
-  for (let i = idx1; i < idx2; i++) {
+  for (let i = i1; i < i2; i++) {
     sum += sections[sectionKeys[i]].distance;
   }
-  return sum;
+  return d * sum;
 }
 
-// Create leg
+// Leg
 // - m: means ("run", "carFL", "carKD", "carPL", "carSS", "train")
 // - s1: section start name
 // - s2: section end name
 // - t1: start time
 // - p: pace, eg "5:10"
-function createLeg(m, s1, s2, t1, p) {
+
+// Create leg by start time and pace
+function createLegByStartAndPace(m, s1, s2, t1, p) {
   const distance = getDistance(s1, s2);
   const paceInSeconds = paceToSec(p);
   const t2 = new Date(t1);
-  t2.setSeconds(t2.getSeconds() + distance * paceInSeconds);
+  t2.setSeconds(t2.getSeconds() + Math.abs(distance) * paceInSeconds);
 
   return {
     means: m,
@@ -115,21 +127,82 @@ function createLeg(m, s1, s2, t1, p) {
   };
 }
 
-function createRunLeg(legs, runnerName, section1, section2, time1) {
-  if (runnerName in runners) {
-    let leg = createLeg(runnerName, section1, section2, time1, runners[runnerName].pace);
-    legs[runnerName].push(leg);
-    return leg;
+// Create leg by end time and pace
+function createLegByEndAndPace(m, s1, s2, t2, p) {
+  const distance = getDistance(s1, s2);
+  const paceInSeconds = paceToSec(p);
+  const t1 = new Date(t2);
+  t1.setSeconds(t1.getSeconds() - Math.abs(distance) * paceInSeconds);
+
+  return {
+    means: m,
+    sectionStart: s1,
+    sectionEnd: s2,
+    timeStart: t1,
+    timeEnd: t2,
+    pace: p,
+    distance: distance
+  };
+}
+
+function checkSections(section1, section2) {
+  if (section1 in sections === false) {
+    console.log("No such section as " + section1);
+    return false;
   }
-  else {
+
+  if (section2 in sections === false) {
+    console.log("No such section as " + section2);
+    return false;
+  }
+
+  return true;
+}
+
+function createRunLeg(runnerName, section1, section2, time1) {
+  if (runnerName in runners === false) {
     console.log("No such runner: " + runnerName);
     return null;
   }
+
+  if (!checkSections(section1, section2)) return null;
+
+  return createLegByStartAndPace("run", section1, section2, time1, runners[runnerName].pace);
 }
 
-function createCarLegs(legs, means, section1, section2, travelers) {
+// Depart from section1 when run starts at section1
+function createCarLegsByStart(legs, means, section1, section2, travelers) {
+  if (!checkSections(section1, section2)) return null;
+
+  if ("timeStart" in sections[section1] === false) {
+    console.log("TimeStart not set at " + section1);
+    return;
+  }
+
   for (let t of travelers) {
-    legs[t].push(createLeg(means, section1, section2, sections[section1].timeStart, "1:00"));
+    if (t in runners === false) {
+      console.log("No such runner as " + t);
+      return;
+    }
+    legs[t].push(createLegByStartAndPace(means, section1, section2, sections[section1].timeStart, "1:00"));
+  }
+}
+
+// Arrive to section2 by the time run starts at section2
+function createCarLegsByEnd(legs, means, section1, section2, travelers) {
+  if (!checkSections(section1, section2)) return null;
+
+  if ("timeStart" in sections[section2] === false) {
+    console.log("TimeStart not set at " + section2);
+    return;
+  }
+
+  for (let t of travelers) {
+    if (t in runners === false) {
+      console.log("No such runner as " + t);
+      return;
+    }
+    legs[t].push(createLegByEndAndPace(means, section1, section2, sections[section2].timeStart, "1:00"));
   }
 }
 
@@ -148,22 +221,68 @@ function createAllRunLegs(legs, t0) {
     }
 
     // Run leg from s0 to s1
-    let leg = createRunLeg(legs, runnerName, sectionKeys[s0], sectionKeys[s1], t);
-    if (leg) {
-      t = leg.timeEnd;
-      // side effect...
-      sections[sectionKeys[s0]].timeStart = leg.timeStart;
-      sections[sectionKeys[s1]].timeEnd = leg.timeEnd;
+    if (runnerName != "") {
+      let leg = createRunLeg(runnerName, sectionKeys[s0], sectionKeys[s1], t);
+      if (leg) {
+        legs[runnerName].push(leg);
+        t = leg.timeEnd;
+        // side effect...
+        sections[sectionKeys[s0]].timeStart = leg.timeStart;
+        sections[sectionKeys[s1]].timeEnd = leg.timeEnd;
+      }
     }
 
     s0 = s1;
   }
+
+  sections["Cél"].timeStart = t;
+
+  // first car departs HQ 10 minutes before start
+  // let t00 = new Date(sections[sectionKeys[1]].timeStart);
+  // t00.setMinutes(t00.getMinutes() - 10);
+  // sections[sectionKeys[0]].timeStart = t00;
 }
 
 function createAllCarLegs(legs) {
-  createCarLegs(legs, "carFL", "Rajt", "Fövenyes", ["FLaci", "Gabi"]);
-  createCarLegs(legs, "carFL", "Fövenyes", "Zánka Erzsébet-tábor", ["Ambrus", "Gabi"]);
-  createCarLegs(legs, "carFL", "Zánka Erzsébet-tábor", "Balatonszepezd", ["FLaci", "Ambrus"]);
+  createCarLegsByEnd(legs, "carFL", "HQ1", "Rajt", ["FLaci", "Ambrus", "Gabi"]);
+  createCarLegsByStart(legs, "carFL", "Rajt", "Fövenyes", ["FLaci", "Gabi"]);
+  createCarLegsByStart(legs, "carFL", "Fövenyes", "Zánka Erzsébet-tábor", ["Ambrus", "Gabi"]);
+  createCarLegsByStart(legs, "carFL", "Zánka Erzsébet-tábor", "Balatonszepezd", ["FLaci", "Ambrus"]);
+  createCarLegsByStart(legs, "carFL", "Balatonszepezd", "HQ1", ["FLaci", "Ambrus", "Gabi"]);
+  // TODO: FLaci from HQ to Balatonboglár ASAP
+  createCarLegsByEnd(legs, "carFL", "HQ1", "Balatonboglár kelet", ["FLaci"]);
+  createCarLegsByEnd(legs, "carFL", "Balatonszemes", "Cél", ["FLaci"]);
+
+  createCarLegsByEnd(legs, "carKD", "HQ1", "Balatonszepezd", ["Dávid", "PP", "Sasa"]);
+  createCarLegsByStart(legs, "carKD", "Balatonszepezd", "Ábrahámhegy", ["Dávid", "PP"]);
+  createCarLegsByStart(legs, "carKD", "Ábrahámhegy", "Badacsonytördemic", ["Dávid", "Sasa"]);
+  createCarLegsByStart(legs, "carKD", "Badacsonytördemic", "Balatonederics", ["PP", "Sasa"]);
+  createCarLegsByStart(legs, "carKD", "Balatonederics", "Fenékpuszta", ["Dávid", "PP", "Sasa"]);
+  createCarLegsByStart(legs, "carKD", "Fenékpuszta", "Balatonmáriafürdő nyugat", ["Dávid", "PP"]);
+  createCarLegsByStart(legs, "carKD", "Balatonmáriafürdő nyugat", "HQ1", ["Dávid", "PP", "Sasa"]);
+
+  createCarLegsByEnd(legs, "carPL", "HQ1", "Balatonederics", ["PLaci", "Zsófi", "Máté"]);
+  createCarLegsByStart(legs, "carPL", "Balatonederics", "Fenékpuszta", ["Zsófi", "Máté"]);
+  createCarLegsByStart(legs, "carPL", "Fenékpuszta", "Balatonmáriafürdő nyugat", ["PLaci", "Zsófi", "Máté"]);
+  createCarLegsByStart(legs, "carPL", "Balatonmáriafürdő nyugat", "Fonyód", ["PLaci", "Zsófi"]);
+  createCarLegsByStart(legs, "carPL", "Fonyód", "Balatonboglár kelet", ["PLaci", "Máté"]);
+  createCarLegsByStart(legs, "carPL", "Balatonboglár kelet", "HQ2", ["PLaci", "Zsófi", "Máté"]);
+  createCarLegsByEnd(legs, "carPL", "HQ2", "Cél", ["PLaci", "Máté"]);
+
+  createCarLegsByEnd(legs, "train", "Siófok kampusz", "Balatonszemes", ["Szabi"]);
+
+  createCarLegsByEnd(legs, "carKD", "HQ2", "Siófok kampusz", ["Dávid", "Ambrus", "Gabi"]);
+  createCarLegsByStart(legs, "carKD", "Siófok kampusz", "Siófok-Sóstó", ["Dávid", "Ambrus"]);
+  createCarLegsByStart(legs, "carKD", "Siófok-Sóstó", "Balatonakarattya", ["Dávid", "Gabi"]);
+  createCarLegsByStart(legs, "carKD", "Balatonakarattya", "Balatonalmádi kelet", ["Ambrus", "Gabi"]);
+  createCarLegsByStart(legs, "carKD", "Balatonalmádi kelet", "Cél", ["Dávid", "Ambrus", "Gabi"]);
+
+  createCarLegsByStart(legs, "carSS", "Siófok kampusz", "HQ2", ["Szabi"]);
+  createCarLegsByEnd(legs, "carSS", "HQ2", "Balatonalmádi kelet", ["Szabi", "Zsófi", "PP", "Sasa"]);
+  createCarLegsByStart(legs, "carSS", "Balatonalmádi kelet", "Balatonalmádi nyugat", ["Szabi", "PP", "Sasa"]);
+  createCarLegsByStart(legs, "carSS", "Balatonalmádi nyugat", "Alsóörs", ["Szabi", "Zsófi", "PP"]);
+  createCarLegsByStart(legs, "carSS", "Alsóörs", "Cél", ["Szabi", "Zsófi", "Sasa"]);
+
 }
 
 // For each key sort legs[key] by timeStart
@@ -199,7 +318,7 @@ function createSectionObjects() {
     const div = document.createElement('div');
     div.id = sectionKeys[i];
     div.className = 'ubobject';
-    div.textContent = sectionKeys[i];
+    div.textContent = sectionKeys[i] + " [" + sections[sectionKeys[i]].runner + "]";
     content.appendChild(div);
   }
   positionSectionObjects();
@@ -220,19 +339,75 @@ function createRunnerObjects() {
   positionRunnerObjects();
 }
 
-function positionRunnerObjects() {
-  const content = document.querySelector('.content');
-  const runnerKeys = Object.keys(runners);
-  const count = runnerKeys.length;
-  const contentWidth = content.offsetWidth;
-  const leftMargin = 300;
-  const rightMargin = 10;
-  const availableWidth = contentWidth - leftMargin - rightMargin;
-  const divWidth = availableWidth / count;
+function getSectionTop(sectionName) {
+  return document.getElementById(sectionName).offsetTop;
+}
 
-  for (let i = 0; i < count; i++) {
-    const div = document.getElementById(runnerKeys[i]);
+const leftMargin = 300;
+const rightMargin = 10;
+const topMargin = 40;
+const bottomMargin = 10;
+
+function positionRunnerObjects() {
+  const runnerKeys = Object.keys(runners);
+  const sectionKeys = Object.keys(sections);
+
+  const content = document.querySelector('.content');
+  const availableWidth = content.offsetWidth - leftMargin - rightMargin;
+  const divWidth = availableWidth / runnerKeys.length;
+  const availableHeight = content.offsetHeight - topMargin - bottomMargin;
+  const divHeight = availableHeight / sectionKeys.length;
+
+  for (let i = runnerKeys.length - 1; i >= 0; i--) {
+    const runnerName = runnerKeys[i];
+    const runnerLegs = legs[runnerName];
+    let runnerTop;
+    let runnerClass = "";
+
+    // (1) no legs, should not happen
+    // (2) we are before the earliest leg (t < first leg's timeStart)
+    // (3) we are after the latest leg (t > last leg's timeEnd)
+    // (4) we are within a leg (leg's timeStart <= t and t <= leg's timeEnd)
+    // (5) we are between two legs (leg's timeEnd < t and t < next leg's timeStart)
+
+    if (runnerLegs.length === 0) {
+      // case (1)
+      runnerTop = topMargin;
+    }
+    else {
+      if (t < runnerLegs[0].timeStart) {
+        // case (2)
+        runnerTop = getSectionTop(runnerLegs[0].sectionStart);
+      }
+      else if (t > runnerLegs[runnerLegs.length - 1].timeEnd) {
+        // case (3)
+        runnerTop = getSectionTop(runnerLegs[runnerLegs.length - 1].sectionEnd);
+      }
+      else {
+        for (let i = 0; i < runnerLegs.length; i++) {
+          if (t < runnerLegs[i].timeStart) {
+            // case (5), also could cover case (2)
+            runnerTop = getSectionTop(runnerLegs[i].sectionStart);
+            break;
+          }
+          else if (t <= runnerLegs[i].timeEnd) {
+            // case (4)
+            let leg = runnerLegs[i];
+            let top1 = getSectionTop(leg.sectionStart);
+            let top2 = getSectionTop(leg.sectionEnd);
+            let progress = (t - leg.timeStart) / (leg.timeEnd - leg.timeStart);
+            runnerTop = top1 + progress * (top2 - top1);
+            runnerClass = leg.means;
+            break;
+          }
+        }
+      }
+    }
+
+    const div = document.getElementById(runnerName);
+    div.className = 'ubobject ' + runnerClass;
     div.style.left = `${leftMargin + i * divWidth}px`;
+    div.style.top = `${runnerTop}px`;
   }
 }
 
@@ -254,6 +429,7 @@ function initialize() {
   createAllCarLegs(legs);
   sortLegs(legs);
   ubt1 = new Date(sections["Cél"].timeEnd);
+  console.log(legs);
   setupTrackSlider();
   updateTimeDisplay();
   createSectionObjects();
@@ -262,14 +438,23 @@ function initialize() {
 
 function setupTrackSlider() {
   const slider = document.getElementById('track-slider');
-  const totalMinutes = (ubt1 - ubt0) / (1000 * 60);
+
+  // let ranget0 = legs["FLaci"][0].timeStart;
+  let ranget0 = new Date(ubt0);
+  ranget0.setMinutes(ranget0.getMinutes() - 3);
+  let ranget1 = new Date(ubt1);
+  ranget1.setMinutes(ranget1.getMinutes() + 3);
+  t = new Date(ranget0);
+
+  const totalMinutes = (ranget1 - ranget0) / (1000 * 60);
   slider.min = 0;
   slider.max = totalMinutes;
   slider.step = 1;
   slider.value = 0;
   slider.addEventListener('input', function () {
-    t = new Date(ubt0.getTime() + this.value * 60 * 1000);
+    t = new Date(ranget0.getTime() + this.value * 60 * 1000);
     updateTimeDisplay();
+    positionRunnerObjects();
   });
 }
 

@@ -36,5 +36,36 @@ footer {
 .ubobject {
   position: absolute;
   font-family: "Verdana";
+  font-weight: bold;
+  padding-left: 4px;
+  padding-right: 4px;
   font-size: 14px;
+}
+
+.run {
+  color: red;
+}
+
+.carFL {
+  background-color: orange;
+  color: white;
+}
+
+.carKD {
+  background-color: blue;
+  color: white;
+}
+
+.carPL {
+  background-color: green;
+  color: white;
+}
+
+.carSS {
+  background-color: grey;
+  color: white;
+}
+
+.train {
+  border: 2px solid black;
 }
