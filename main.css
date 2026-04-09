@@ -33,6 +33,22 @@ footer {
   width: 100%;
 }
 
+#play-pause-btn {
+  width: 2.5em;
+  height: 2.5em;
+  margin-right: 0.5em;
+  font-size: 1em;
+  background: #555;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#play-pause-btn:hover {
+  background: #666;
+}
+
 .ubobject {
   position: absolute;
   font-family: "Verdana";

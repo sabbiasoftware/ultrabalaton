@@ -423,6 +423,8 @@ let ubt0 = new Date("2026-04-25T21:55:00"); // start of ub (start time of first 
 let ubt1 = new Date(ubt0); // end of ub (finish time of last runnner)
 let t = new Date(ubt0);
 let legs = initializeLegs();
+let isPlaying = false;
+let playInterval = null;
 
 function initialize() {
   createAllRunLegs(legs, ubt0);
@@ -452,10 +454,49 @@ function setupTrackSlider() {
   slider.step = 1;
   slider.value = 0;
   slider.addEventListener('input', function () {
+    pause();
     t = new Date(ranget0.getTime() + this.value * 60 * 1000);
     updateTimeDisplay();
     positionRunnerObjects();
   });
+
+  const playPauseBtn = document.getElementById('play-pause-btn');
+  playPauseBtn.addEventListener('click', togglePlayPause);
+}
+
+function togglePlayPause() {
+  if (isPlaying) {
+    pause();
+  } else {
+    play();
+  }
+}
+
+function play() {
+  if (isPlaying) return;
+  isPlaying = true;
+  document.getElementById('play-pause-btn').textContent = '⏸';
+  playInterval = setInterval(() => {
+    const slider = document.getElementById('track-slider');
+    if (parseFloat(slider.value) >= parseFloat(slider.max)) {
+      pause();
+      return;
+    }
+    slider.value = parseFloat(slider.value) + 1;
+    const ranget0 = new Date(ubt0);
+    ranget0.setMinutes(ranget0.getMinutes() - 3);
+    t = new Date(ranget0.getTime() + slider.value * 60 * 1000);
+    updateTimeDisplay();
+    positionRunnerObjects();
+  }, 50);
+}
+
+function pause() {
+  if (!isPlaying) return;
+  isPlaying = false;
+  document.getElementById('play-pause-btn').textContent = '▶';
+  clearInterval(playInterval);
+  playInterval = null;
 }
 
 function formatTime24(date) {
