@@ -319,7 +319,7 @@ function createSectionObjects() {
     div.id = sectionKeys[i];
     div.className = 'ubobject';
     var sectionText = sectionKeys[i] + " [" + sections[sectionKeys[i]].runner + "]";
-    if 'timeStart' in sections[sectionKeys[i]] {
+    if ('timeStart' in sections[sectionKeys[i]]) {
       sectionText = sectionText + " [" + formatTime24(sections[sectionKeys[i]].timeStart) + "]";
     }
     div.textContent = sectionText;
