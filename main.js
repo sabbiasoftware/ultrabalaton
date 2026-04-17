@@ -1,11 +1,11 @@
 const runners = {
   "Ambrus": { pace: "5:50" },
   "FLaci": { pace: "6:00" },
-  "Gabi": { pace: "6:40" },
+  "Gabi": { pace: "7:00" },
   "Sasa": { pace: "5:30" },
   "PP": { pace: "5:00" },
   "Dávid": { pace: "5:40" },
-  "PLaci": { pace: "5:00" },
+  "PLaci": { pace: "5:30" },
   "Máté": { pace: "6:00" },
   "Zsófi": { pace: "5:50" },
   "Szabi": { pace: "5:00" }
