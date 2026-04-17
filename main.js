@@ -318,7 +318,11 @@ function createSectionObjects() {
     const div = document.createElement('div');
     div.id = sectionKeys[i];
     div.className = 'ubobject';
-    div.textContent = sectionKeys[i] + " [" + sections[sectionKeys[i]].runner + "]";
+    var sectionText = sectionKeys[i] + " [" + sections[sectionKeys[i]].runner + "]";
+    if 'timeStart' in sectionKeys[i] {
+      sectionText = sectionText + " [" + formatTime24(sectionKeys[i].timeStart) + "]";
+    }
+    div.textContent = sectionText;
     content.appendChild(div);
   }
   positionSectionObjects();
