@@ -1,12 +1,12 @@
 const runners = {
-  "Ambrus": { pace: "5:50" },
+  "Ambrus": { pace: "6:00" },
   "FLaci": { pace: "7:00" },
   "Gabi": { pace: "7:00" },
   "Sasa": { pace: "5:30" },
   "PP": { pace: "5:00" },
   "Dávid": { pace: "5:40" },
   "PLaci": { pace: "5:30" },
-  "Máté": { pace: "6:00" },
+  "Máté": { pace: "6:30" },
   "Zsófi": { pace: "5:50" },
   "Szabi": { pace: "5:00" }
 }
@@ -506,7 +506,8 @@ function pause() {
 function formatTime24(date) {
   const h = String(date.getHours()).padStart(1, '0');
   const m = String(date.getMinutes()).padStart(2, '0');
-  return `${h}:${m}`;
+  const s = String(date.getSeconds()).padStart(2, '0');
+  return `${h}:${m}:${s}`;
 }
 
 function updateTimeDisplay() {
