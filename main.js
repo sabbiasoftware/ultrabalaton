@@ -1,6 +1,6 @@
 const runners = {
   "Ambrus": { pace: "5:50" },
-  "FLaci": { pace: "6:00" },
+  "FLaci": { pace: "7:00" },
   "Gabi": { pace: "7:00" },
   "Sasa": { pace: "5:30" },
   "PP": { pace: "5:00" },
