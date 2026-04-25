@@ -3,7 +3,6 @@ const runners = {
   "FLaci": { pace: "7:00" },
   "Gabi": { pace: "7:00" },
   "Sasa": { pace: "5:30" },
-  "PP": { pace: "5:00" },
   "Dávid": { pace: "5:40" },
   "PLaci": { pace: "5:30" },
   "Máté": { pace: "6:30" },
@@ -22,21 +21,21 @@ const sections = {
   "Balatonszepezd": { distance: 3.2, runner: "Sasa" },
   "Révfülöp kelet": { distance: 1.9, runner: "Sasa" },
   "Révfülöp nyugat": { distance: 5.2, runner: "Sasa" },
-  "Ábrahámhegy": { distance: 3.2, runner: "PP" },
-  "Badacsonyörs Varga pincészet": { distance: 5.1, runner: "PP" },
-  "Badacsony": { distance: 4.3, runner: "PP" },
-  "Badacsonytördemic": { distance: 2.9, runner: "Dávid" },
+  "Ábrahámhegy": { distance: 3.2, runner: "Sasa" },
+  "Badacsonyörs Varga pincészet": { distance: 5.1, runner: "Sasa" },
+  "Badacsony": { distance: 4.3, runner: "Sasa" },
+  "Badacsonytördemic": { distance: 2.9, runner: "Sasa" },
   "Szigliget": { distance: 5, runner: "Dávid" },
-  "Balatonederics": { distance: 2.6, runner: "PLaci" },
-  "Balatongyörök kelet": { distance: 2.8, runner: "PLaci" },
-  "Balatongyörök nyugat": { distance: 3.4, runner: "PLaci" },
+  "Balatonederics": { distance: 2.6, runner: "Dávid" },
+  "Balatongyörök kelet": { distance: 2.8, runner: "Dávid" },
+  "Balatongyörök nyugat": { distance: 3.4, runner: "Dávid" },
   "Vonyarcvashegy kelet": { distance: 2.6, runner: "PLaci" },
   "Gyenesdiás": { distance: 1.7, runner: "PLaci" },
   "Keszthely kelet": { distance: 3.1, runner: "PLaci" },
   "Keszthely nyugat": { distance: 4.8, runner: "PLaci" },
-  "Fenékpuszta": { distance: 4.3, runner: "Sasa" },
-  "Balatonberény nyugat": { distance: 2.9, runner: "Sasa" },
-  "Balatonberény focipálya": { distance: 4, runner: "Sasa" },
+  "Fenékpuszta": { distance: 4.3, runner: "PLaci" },
+  "Balatonberény nyugat": { distance: 2.9, runner: "PLaci" },
+  "Balatonberény focipálya": { distance: 4, runner: "PLaci" },
   "Balatonmáriafürdő nyugat": { distance: 5.2, runner: "Máté" },
   "Balatonmáriafürdő kelet": { distance: 1.7, runner: "Máté" },
   "Balatonfenyves nyugat": { distance: 1.8, runner: "Máté" },
@@ -65,12 +64,12 @@ const sections = {
   "Balatonakarattya": { distance: 6, runner: "Dávid" },
   "Balatonkenese": { distance: 5.5, runner: "Dávid" },
   "Balatonfűzfő": { distance: 3.4, runner: "Dávid" },
-  "Tobruk ": { distance: 3, runner: "Dávid" },
+  "Tobruk": { distance: 3, runner: "Zsófi" },
   "Balatonalmádi kelet": { distance: 3, runner: "Zsófi" },
-  "Balatonalmádi nyugat": { distance: 5.9, runner: "Sasa" },
-  "Alsóörs": { distance: 4.8, runner: "PP" },
-  "Csopak": { distance: 4.2, runner: "PP" },
-  "Balatonfüred kelet": { distance: 3.5, runner: "PP" },
+  "Balatonalmádi nyugat": { distance: 5.9, runner: "Szabi" },
+  "Alsóörs": { distance: 4.8, runner: "Szabi" },
+  "Csopak": { distance: 4.2, runner: "Sasa" },
+  "Balatonfüred kelet": { distance: 3.5, runner: "Sasa" },
   "Cél": { distance: 2, runner: "" },
   "HQ2": { distance: 0, runner: "" }
 }
@@ -253,17 +252,13 @@ function createAllCarLegs(legs) {
   createCarLegsByEnd(legs, "carFL", "HQ1", "Balatonboglár kelet", ["FLaci"]);
   createCarLegsByEnd(legs, "carFL", "Balatonszemes", "Cél", ["FLaci"]);
 
-  createCarLegsByEnd(legs, "carKD", "HQ1", "Balatonszepezd", ["Dávid", "PP", "Sasa"]);
-  createCarLegsByStart(legs, "carKD", "Balatonszepezd", "Ábrahámhegy", ["Dávid", "PP"]);
-  createCarLegsByStart(legs, "carKD", "Ábrahámhegy", "Badacsonytördemic", ["Dávid", "Sasa"]);
-  createCarLegsByStart(legs, "carKD", "Badacsonytördemic", "Balatonederics", ["PP", "Sasa"]);
-  createCarLegsByStart(legs, "carKD", "Balatonederics", "Fenékpuszta", ["Dávid", "PP", "Sasa"]);
-  createCarLegsByStart(legs, "carKD", "Fenékpuszta", "Balatonmáriafürdő nyugat", ["Dávid", "PP"]);
-  createCarLegsByStart(legs, "carKD", "Balatonmáriafürdő nyugat", "HQ1", ["Dávid", "PP", "Sasa"]);
+  createCarLegsByEnd(legs, "carKD", "HQ1", "Balatonszepezd", ["Dávid", "Sasa"]);
+  createCarLegsByStart(legs, "carKD", "Balatonszepezd", "Szigliget", ["Dávid"]);
+  createCarLegsByStart(legs, "carKD", "Szigliget", "Vonyarcvashegy kelet", ["Sasa"]);
+  createCarLegsByStart(legs, "carKD", "Vonyarcvashegy kelet", "HQ1", ["Dávid", "Sasa"]);
 
-  createCarLegsByEnd(legs, "carPL", "HQ1", "Balatonederics", ["PLaci", "Zsófi", "Máté"]);
-  createCarLegsByStart(legs, "carPL", "Balatonederics", "Fenékpuszta", ["Zsófi", "Máté"]);
-  createCarLegsByStart(legs, "carPL", "Fenékpuszta", "Balatonmáriafürdő nyugat", ["PLaci", "Zsófi", "Máté"]);
+  createCarLegsByEnd(legs, "carPL", "HQ1", "Vonyarcvashegy kelet", ["PLaci", "Zsófi", "Máté"]);
+  createCarLegsByStart(legs, "carPL", "Vonyarcvashegy kelet", "Balatonmáriafürdő nyugat", ["Zsófi", "Máté"]);
   createCarLegsByStart(legs, "carPL", "Balatonmáriafürdő nyugat", "Fonyód", ["PLaci", "Zsófi"]);
   createCarLegsByStart(legs, "carPL", "Fonyód", "Balatonboglár kelet", ["PLaci", "Máté"]);
   createCarLegsByStart(legs, "carPL", "Balatonboglár kelet", "HQ2", ["PLaci", "Zsófi", "Máté"]);
@@ -274,14 +269,14 @@ function createAllCarLegs(legs) {
   createCarLegsByEnd(legs, "carKD", "HQ2", "Siófok kampusz", ["Dávid", "Ambrus", "Gabi"]);
   createCarLegsByStart(legs, "carKD", "Siófok kampusz", "Siófok-Sóstó", ["Dávid", "Ambrus"]);
   createCarLegsByStart(legs, "carKD", "Siófok-Sóstó", "Balatonakarattya", ["Dávid", "Gabi"]);
-  createCarLegsByStart(legs, "carKD", "Balatonakarattya", "Balatonalmádi kelet", ["Ambrus", "Gabi"]);
-  createCarLegsByStart(legs, "carKD", "Balatonalmádi kelet", "Cél", ["Dávid", "Ambrus", "Gabi"]);
+  createCarLegsByStart(legs, "carKD", "Balatonakarattya", "Tobruk", ["Ambrus", "Gabi"]);
+  createCarLegsByStart(legs, "carKD", "Tobruk", "Cél", ["Dávid", "Ambrus", "Gabi"]);
 
   createCarLegsByStart(legs, "carSS", "Siófok kampusz", "HQ2", ["Szabi"]);
-  createCarLegsByEnd(legs, "carSS", "HQ2", "Balatonalmádi kelet", ["Szabi", "Zsófi", "PP", "Sasa"]);
-  createCarLegsByStart(legs, "carSS", "Balatonalmádi kelet", "Balatonalmádi nyugat", ["Szabi", "PP", "Sasa"]);
-  createCarLegsByStart(legs, "carSS", "Balatonalmádi nyugat", "Alsóörs", ["Szabi", "Zsófi", "PP"]);
-  createCarLegsByStart(legs, "carSS", "Alsóörs", "Cél", ["Szabi", "Zsófi", "Sasa"]);
+  createCarLegsByEnd(legs, "carSS", "HQ2", "Tobruk", ["Szabi", "Zsófi", "Sasa"]);
+  createCarLegsByStart(legs, "carSS", "Tobruk", "Balatonalmádi nyugat", ["Szabi", "Sasa"]);
+  createCarLegsByStart(legs, "carSS", "Balatonalmádi nyugat", "Csopak", ["Sasa", "Zsófi"]);
+  createCarLegsByStart(legs, "carSS", "Csopak", "Cél", ["Szabi", "Zsófi"]);
 
 }
 
